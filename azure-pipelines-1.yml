@@ -1,0 +1,39 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master  # Trigger pipeline on every push to master
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu environment
+
+steps:
+# Step 1: Checkout code from your repository
+- checkout: self
+
+# Step 2: Install JDK (Java 11 in this case)
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+
+# Step 3: Set up Maven
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'  # Points to your project's pom.xml file
+    goals: 'clean install'  # Builds the project
+
+# Step 4: Run unit tests with Maven
+- script: |
+    mvn test
+  displayName: 'Run Unit Tests'
+
+# Step 5: Archive the build output (optional)
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(System.DefaultWorkingDirectory)/target/*.jar'
+    artifactName: 'JavaAppPackage'
+    publishLocation: 'Container'
+  displayName: 'Archive Maven Build Artifacts'
