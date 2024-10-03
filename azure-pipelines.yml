@@ -1,0 +1,41 @@
+trigger:
+- master  # Trigger the pipeline when changes are pushed to the 'master' branch
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image for the build environment
+
+steps:
+# Step 1: Checkout the code from your GitHub repository
+- task: GitHubCheckout@1
+  inputs:
+    repository: 'anil0740/FlightManagement'  # Replace with your GitHub repo
+    ref: 'refs/heads/master'
+
+# Step 2: Set up JDK 11 (or another version if necessary)
+- task: UseJava@1
+  inputs:
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+
+# Step 3: Build the project using Maven
+- script: |
+    mvn clean install
+  displayName: 'Build Java project with Maven'
+
+# Step 4: Run unit tests
+- script: |
+    mvn test
+  displayName: 'Run Unit Tests'
+
+# Step 5: Package the project
+- script: |
+    mvn package
+  displayName: 'Package the project'
+
+# Step 6: (Optional) Archive the JAR for artifact deployment or download
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(System.DefaultWorkingDirectory)/target/*.jar'
+    artifactName: 'FlightManagementPackage'
+    publishLocation: 'Container'
+  displayName: 'Archive .jar file as an artifact'
