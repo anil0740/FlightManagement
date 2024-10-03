@@ -5,17 +5,15 @@ pool:
   vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image for the build environment
 
 steps:
-# Step 1: Checkout the code from your GitHub repository
-- task: GitHubCheckout@1
-  inputs:
-    repository: 'anil0740/FlightManagement'  # Replace with your GitHub repo
-    ref: 'refs/heads/master'
+# Step 1: Checkout the code from your GitHub repository using the built-in checkout command
+- checkout: self  # This checks out the repository the pipeline is running against
 
-# Step 2: Set up JDK 11 (or another version if necessary)
-- task: UseJava@1
+# Step 2: Install JDK 11 (or adjust the version to what you need)
+- task: JavaToolInstaller@0
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'  # Use pre-installed JDK, or change this to install a custom JDK
 
 # Step 3: Build the project using Maven
 - script: |
